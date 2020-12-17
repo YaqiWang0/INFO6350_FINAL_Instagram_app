@@ -5,6 +5,8 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     
+    @State var showSignoutError: Bool = false
+    
     var body: some View {
         NavigationView {
             ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false, content: {
@@ -46,8 +48,14 @@ struct SettingsView: View {
                             SettingsRowView(leftIcon: "photo", text: "Profile Picture", color: Color.MyTheme.purpleColor)
                         })
                 
-                    
-                    SettingsRowView(leftIcon: "figure.walk", text: "Sign out", color: Color.MyTheme.purpleColor)
+                    Button(action: {
+                        signOut()
+                    }, label: {
+                        SettingsRowView(leftIcon: "figure.walk", text: "Sign out", color: Color.MyTheme.purpleColor)
+                    })
+                    .alert(isPresented: $showSignoutError, content: {
+                        return Alert(title: Text("Error signing out 🥵"))
+                    })
                 })
                 .padding()
                 
@@ -109,6 +117,21 @@ struct SettingsView: View {
         
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
+        }
+    }
+    
+    func signOut() {
+        AuthService.instance.logOutUser { (success) in
+            if(success) {
+                print("Success fully logged out")
+                
+                //Dismiss setting view
+                self.presentationMode.wrappedValue.dismiss()
+
+            } else {
+                print("Error logging out")
+                self.showSignoutError.toggle()
+            }
         }
     }
 }

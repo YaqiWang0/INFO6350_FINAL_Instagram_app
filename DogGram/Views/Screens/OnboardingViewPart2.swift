@@ -9,10 +9,18 @@ import SwiftUI
 
 struct OnboardingViewPart2: View {
     
-    @State var displayName: String = ""
+    @Environment(\.presentationMode) var presentationMode
+    
+    @Binding var displayName: String
+    @Binding var email: String
+    @Binding var providerId: String
+    @Binding var provider: String
+    
+    
     @State var showImagePicker: Bool = false
     @State var imageSelected: UIImage = UIImage(named: "logo")!
     @State var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State var showError = false
     
     var body: some View {
         VStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 20, content: {
@@ -54,16 +62,45 @@ struct OnboardingViewPart2: View {
         .sheet(isPresented: $showImagePicker, onDismiss: createProfile, content: {
             ImagePicker(imageSelected: $imageSelected, sourceType: $sourceType)
         })
+        .alert(isPresented: $showError) {
+            () -> Alert in
+            return Alert(title: Text("Error creating profile 😤"))
+        }
     }
     
     // MARK: FUNCTIONS
     func createProfile() {
-        print("CREATE PROFILE NOW")
+        AuthService.instance.createNewUserInDatabase(name: displayName, email: email, providerID: providerId, provider: provider, profileImage: imageSelected) { (returnedUserID) in
+            if let userID = returnedUserID {
+                print("Successfully created new user in database")
+                AuthService.instance.logInUserToApp(userID: userID) { (success) in
+                    if success {
+                        print("User logged in")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+
+                        
+                    } else {
+                        print("Error logging in")
+                        self.showError.toggle()
+                    }
+                }
+                
+            } else {
+                print("error creating user in Database")
+                self.showError.toggle()
+            }
+        }
+        
     }
 }
 
 struct OnboardingViewPart2_Previews: PreviewProvider {
+    @State static var testString: String = "test"
+
     static var previews: some View {
-        OnboardingViewPart2()
+        OnboardingViewPart2(displayName: $testString, email: $testString, providerId: $testString, provider: $testString)
+            .preferredColorScheme(.dark)
     }
 }

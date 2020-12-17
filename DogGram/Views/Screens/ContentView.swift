@@ -11,7 +11,7 @@ struct ContentView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
-    var currentUserID: String? = "user"
+    @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
     
     var body: some View {
         TabView {
