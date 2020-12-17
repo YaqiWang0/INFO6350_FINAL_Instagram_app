@@ -15,7 +15,7 @@ struct FeedView: View {
         ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false, content: {
             LazyVStack {
                 ForEach(posts.dataArray, id: \.self) { post in
-                    PostView(post: post, showHeaderOrFooter: true)
+                    PostView(post: post, addheartAnimationToView: true, showHeaderOrFooter: true)
                 }
             }
         })

@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    var currentUserID: String? = "user"
+    
     var body: some View {
         TabView {
             NavigationView {
@@ -25,23 +30,32 @@ struct ContentView: View {
                     Text("Browse")
                 }
             
-            Text("Screen 3")
+            UploadView()
                 .tabItem {
                     Image(systemName: "square.and.arrow.up.fill")
                     Text("Upload")
                 }
-            
-            Text("Screen 4")
+            ZStack {
+                if currentUserID != nil {
+                    NavigationView {
+                        ProfileView(isMyProfile: true, profileDisplayName: "My Profile", profileUserID: "")
+                    }
+                } else {
+                    SignUpView()
+                }
+                
+            }
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Profile")
                 }
-        }.accentColor(Color.MyTheme.purpleColor)
+        }.accentColor(colorScheme == .light ? Color.MyTheme.purpleColor : Color.MyTheme.yellowColor)
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .preferredColorScheme(.dark)
     }
 }
