@@ -14,7 +14,9 @@ struct PostView: View {
     @State var addheartAnimationToView: Bool
     @State var showActionSheet: Bool = false
     @State var actionSheetType: PostActionSheetOption = .general
-    @State var postImage: UIImage = UIImage(named: "dog1")!
+    
+    @State var postImage: UIImage = UIImage(named: "logo.loading")!
+    @State var profileImage: UIImage = UIImage(named: "logo.loading")!
     
     enum PostActionSheetOption {
         case general
@@ -31,9 +33,9 @@ struct PostView: View {
                 HStack {
                     
                     NavigationLink(
-                        destination: ProfileView(isMyProfile: false, profileDisplayName: post.username, profileUserID: post.userID),
+                        destination: ProfileView(isMyProfile: false, profileDisplayName: post.username, profileUserID: post.userID, posts: PostArrayObject(userID: post.userID)),
                         label: {
-                            Image("dog1")
+                            Image(uiImage: profileImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 30, height: 30, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
@@ -121,6 +123,9 @@ struct PostView: View {
                 }
             }
         })
+        .onAppear {
+            getImages()
+        }
     }
     
     
@@ -142,6 +147,21 @@ struct PostView: View {
         
         let updatedPost = PostModel(postID: post.postID, userID: post.postID, username: post.username, caption: post.caption, dateCreated: post.dateCreated, likeCount: post.likeCount - 1, likedByUser: false)
         self.post = updatedPost
+    }
+    
+    func getImages() {
+        // Get profile image
+        ImageManager.instance.downloadProfileImage(userID: post.userID) { (returnedImage) in
+            if let image = returnedImage {
+                self.profileImage = image
+            }
+        }
+        
+        ImageManager.instance.downloadPostImage(postID: post.postID) { (returnedImage) in
+            if let image = returnedImage {
+                self.postImage = image
+            }
+        }
     }
     
     func getActionSheet() -> ActionSheet {
