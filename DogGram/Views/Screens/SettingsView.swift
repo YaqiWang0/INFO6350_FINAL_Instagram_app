@@ -7,6 +7,11 @@ struct SettingsView: View {
     
     @State var showSignoutError: Bool = false
     
+    @Binding var userDisplayName: String
+    @Binding var userBio: String
+    
+    @Binding var userProfilePicture: UIImage
+    
     var body: some View {
         NavigationView {
             ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false, content: {
@@ -19,7 +24,7 @@ struct SettingsView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 80, height: 80, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-                            .cornerRadius(20)
+                            .cornerRadius(12)
                         
                         Text("DogGram is the #1 for posting pictures of your  dog and sharing them across the world, We are a dog-loving community and we're happy to have you!")
                             .font(.footnote)
@@ -30,20 +35,20 @@ struct SettingsView: View {
                 // MARK: SECTION 2: PROFILE
                 GroupBox(label: SettingsLabelView(labelText: "Profile", labelImage: "person.fill"), content: {
                     NavigationLink(
-                        destination: SettingEditTextView(submissionText: "Current display name", title: "Display name", description: "Your can edit your display name here, this will be seen by other users on your profile and on your posts!", placeholder: "Your display name here ..."),
+                        destination: SettingEditTextView(submissionText: userDisplayName, title: "Display name", description: "Your can edit your display name here, this will be seen by other users on your profile and on your posts!", placeholder: "Your display name here ...", settingsEditTextOption: .displayName, profileText: $userDisplayName),
                         label: {
                             SettingsRowView(leftIcon: "pencil", text: "Display Name", color: Color.MyTheme.purpleColor)
                         })
                     
                     NavigationLink (
-                        destination: SettingEditTextView(submissionText: "Current bio here", title: "Profile Bio", description: "Your bio is a great place ti let users know a little about you. It will be shonw on your profile only", placeholder: "Your bio here ..."),
+                        destination: SettingEditTextView(submissionText: userBio, title: "Profile Bio", description: "Your bio is a great place ti let users know a little about you. It will be shonw on your profile only", placeholder: "Your bio here ...", settingsEditTextOption: .bio, profileText: $userBio),
                         label: {
                             SettingsRowView(leftIcon: "text.quote", text: "Bio", color: Color.MyTheme.purpleColor)
                         })
                     
                    
                     NavigationLink (
-                        destination: SettingsEditImageView(title: "Profile Picture", description: "Your profile picture will be shown on your profile and on your posts. Most users ake it a image of themselves or their dog!", selectedImage: UIImage(named: "dog1")!),
+                        destination: SettingsEditImageView(title: "Profile Picture", description: "Your profile picture will be shown on your profile and on your posts. Most users ake it a image of themselves or their dog!", selectedImage: userProfilePicture, profileImage: $userProfilePicture),
                         label: {
                             SettingsRowView(leftIcon: "photo", text: "Profile Picture", color: Color.MyTheme.purpleColor)
                         })
@@ -137,8 +142,10 @@ struct SettingsView: View {
 }
 
 struct SettingsView_Previews: PreviewProvider {
+    @State static var testString: String = "test string"
+    @State static var image : UIImage = UIImage(named: "dog1")!
     static var previews: some View {
-        SettingsView()
+        SettingsView(userDisplayName: $testString, userBio: $testString, userProfilePicture: $image)
             .preferredColorScheme(.dark)
     }
 }

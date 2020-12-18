@@ -5,6 +5,7 @@ struct ProfileView: View {
     @Environment(\.colorScheme) var colorScheme
     var isMyProfile: Bool
     @State var profileDisplayName: String
+    @State var profileBio: String = ""
     @State var showSettings: Bool = false
     var profileUserID: String
     
@@ -15,7 +16,7 @@ struct ProfileView: View {
     
     var body: some View {
         ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false, content: {
-            ProfileHeaderView(profileDisplayName: $profileDisplayName, profileImage: $profileImage)
+            ProfileHeaderView(profileDisplayName: $profileDisplayName, profileImage: $profileImage, profileBio: $profileBio, postArray: posts)
             Divider()
             ImageGridView(posts: posts)
         })
@@ -32,9 +33,11 @@ struct ProfileView: View {
         )
         .onAppear(perform: {
             getProfileImage()
+            getAdditinalProfileInfo()
+            
         })
         .sheet(isPresented: $showSettings, content: {
-            SettingsView()
+            SettingsView(userDisplayName: $profileDisplayName, userBio: $profileBio, userProfilePicture: $profileImage)
                 .preferredColorScheme(colorScheme)
         })
     }
@@ -45,6 +48,17 @@ struct ProfileView: View {
         ImageManager.instance.downloadProfileImage(userID: profileUserID) { (returnedImage) in
             if let image = returnedImage {
                 self.profileImage = image
+            }
+        }
+    }
+    
+    func getAdditinalProfileInfo() {
+        AuthService.instance.getUserInfo(forUserID: profileUserID) { (returnedDisplayName, returnedBio) in
+            if let displayName = returnedDisplayName {
+                self.profileDisplayName = displayName
+            }
+            if let bio = returnedBio {
+                self.profileBio = bio
             }
         }
     }

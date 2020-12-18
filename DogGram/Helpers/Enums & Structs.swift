@@ -56,3 +56,10 @@ struct DatabaseCommentField { //Fields within the comment sub-collection of a po
     static let content = "content"
     static let dateCreated = "date_created"
 }
+
+
+enum SettingsEditTextOption {
+    case displayName
+    case bio
+}
+

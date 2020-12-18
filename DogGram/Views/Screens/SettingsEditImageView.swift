@@ -14,6 +14,10 @@ struct SettingsEditImageView: View {
     @State var selectedImage: UIImage //Image shown on this screen
     @State var showImagePicker: Bool = false
     @State var sourceType: UIImagePickerController.SourceType = UIImagePickerController.SourceType.photoLibrary
+    @Binding var profileImage: UIImage
+    @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
+    @State var showSuccessAlert: Bool = false
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20){
@@ -49,7 +53,7 @@ struct SettingsEditImageView: View {
             
 
             Button(action: {
-                
+                saveImage()
             }, label: {
                 Text("Save".uppercased())
                         .font(.title3)
@@ -68,13 +72,33 @@ struct SettingsEditImageView: View {
         .padding()
         .frame(maxWidth: .infinity)
         .navigationBarTitle(title)
+        .alert(isPresented: $showSuccessAlert) { () -> Alert in
+            return Alert(title: Text("Success! 🥳"), message: nil, dismissButton: .default(Text("OK"), action: {
+                self.presentationMode.wrappedValue.dismiss()
+            }))
+        }
+    }
+    
+    
+    //MARK: FUNCTIONS
+    func saveImage() {
+        
+        guard let userID = currentUserID else{ return }
+        //Update the UI of the profile
+        self.profileImage = selectedImage
+        
+        // Update profile image in database
+        ImageManager.instance.uplaodProfileImage(userID: userID, image: selectedImage)
+        
+        self.showSuccessAlert.toggle()
     }
 }
 
 struct SettingsEditImageView_Previews: PreviewProvider {
+    @State static var image: UIImage = UIImage(named: "dog1")!
     static var previews: some View {
         NavigationView {
-            SettingsEditImageView(title: "Title", description: "Description", selectedImage: UIImage(named: "dog1")!)
+            SettingsEditImageView(title: "Title", description: "Description", selectedImage: UIImage(named: "dog1")!, profileImage: $image)
         }
     }
 }

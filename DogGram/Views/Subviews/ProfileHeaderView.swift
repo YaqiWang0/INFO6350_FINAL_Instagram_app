@@ -10,6 +10,11 @@ import SwiftUI
 struct ProfileHeaderView: View {
     @Binding var profileDisplayName: String
     @Binding var profileImage: UIImage
+    @Binding var profileBio: String
+    @ObservedObject var postArray: PostArrayObject
+
+
+
     var body: some View {
         VStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 10, content: {
             
@@ -27,17 +32,20 @@ struct ProfileHeaderView: View {
                 .fontWeight(.bold)
             
             // MARK: BIO
-            Text("Text here for the bio")
-                .font(.body)
-                .fontWeight(.regular)
-                .multilineTextAlignment(.center)
+            if profileBio != "" {
+                Text(profileBio)
+                    .font(.body)
+                    .fontWeight(.regular)
+                    .multilineTextAlignment(.center)
+            }
+            
             
             HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/, spacing: 20, content: {
                 
                 // MARK: POSTS
                 VStack(alignment: .center, spacing: 5, content: {
                     
-                    Text("5")
+                    Text(postArray.postCountString)
                         .font(.title2)
                         .fontWeight(.bold)
                     
@@ -54,7 +62,7 @@ struct ProfileHeaderView: View {
                 // MARK: LIKES
                 VStack(alignment: .center, spacing: 5, content: {
                     
-                    Text("20")
+                    Text(postArray.likeCountString)
                         .font(.title2)
                         .fontWeight(.bold)
                     
@@ -79,7 +87,7 @@ struct ProfileHeaderView_Previews: PreviewProvider {
     @State static var name: String = "Joe"
     @State static var image: UIImage = UIImage(named: "dog1")!
     static var previews: some View {
-        ProfileHeaderView(profileDisplayName: $name, profileImage: $image)
+        ProfileHeaderView(profileDisplayName: $name, profileImage: $image, profileBio: $name, postArray: PostArrayObject(shuffled: false))
             .previewLayout(.sizeThatFits)
     }
 }
